@@ -1,33 +1,48 @@
-import React from "react";
-import { Form, Icon, Input, Button, Checkbox } from "antd";
+import React, { Component } from "react";
+import { Form, Icon, Input, Button } from "antd";
 
 import api from "../../services/api";
-import { login } from "../../services/auth";
 import { veryfyAccessToken } from "../../services/accessToken";
+import history from "../../services/history";
 
-class LoginClass extends React.Component {
+class LoginClass extends Component {
+  state = {
+    email: "",
+    password: ""
+  };
+
   componentDidMount() {
+    /**
+     * For create new Access token key i call this function
+     * But it's not correct i now this
+     * But this is just for test :)
+     */
     veryfyAccessToken();
   }
+
   handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields = async (err, values) => {
-      if (!err) {
-        console.log("Received values of form: ", values);
-      }
+    let { email, password } = this.state;
 
-      // const response = await api
-      //   .post("/auth/session-register", {
-      //     values
-      //   })
-      //   .then(function(response) {
-      //     login(response.data.token);
-      //     document.location.reload(true);
-      //   })
-      //   .catch(function(error) {
-      //     console.log("Error Login: ", error);
-      //   });
-    };
+    this.props.form.validateFields(async err => {
+      if (!err) {
+        const response = await api
+          .post("/auth/session-register", {
+            organization_user: { email, password }
+          })
+          .then(response => {
+            /**
+             * Here we need setup the TOKEN from api
+             * But because the access token key i just show de response data
+             */
+            console.log("Data access_key", response.data);
+            return history.push("/home");
+          })
+          .catch(error => {
+            console.log("Error Login: ", error);
+          });
+      }
+    });
   };
 
   render() {
@@ -35,12 +50,14 @@ class LoginClass extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit} className="login-form">
         <Form.Item>
-          {getFieldDecorator("username", {
-            rules: [{ required: true, message: "Please input your username!" }]
+          {getFieldDecorator("email", {
+            rules: [{ required: true, message: "Please input your email!" }]
           })(
             <Input
               prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-              placeholder="Username"
+              placeholder="Email"
+              type="email"
+              onChange={e => this.setState({ email: e.target.value })}
             />
           )}
         </Form.Item>
@@ -52,17 +69,11 @@ class LoginClass extends React.Component {
               prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
               type="password"
               placeholder="Password"
+              onChange={e => this.setState({ password: e.target.value })}
             />
           )}
         </Form.Item>
         <Form.Item>
-          {getFieldDecorator("remember", {
-            valuePropName: "checked",
-            initialValue: true
-          })(<Checkbox>Remember me</Checkbox>)}
-          <a className="login-form-forgot" href="/">
-            Forgot password
-          </a>
           <Button
             type="primary"
             htmlType="submit"
