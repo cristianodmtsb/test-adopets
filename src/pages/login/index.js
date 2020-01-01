@@ -3,8 +3,12 @@ import { Form, Icon, Input, Button, Checkbox } from "antd";
 
 import api from "../../services/api";
 import { login } from "../../services/auth";
+import { veryfyAccessToken } from "../../services/accessToken";
 
 class LoginClass extends React.Component {
+  componentDidMount() {
+    veryfyAccessToken();
+  }
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields = async (err, values) => {
