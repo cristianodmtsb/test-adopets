@@ -4,7 +4,6 @@ import history from "../services/history";
 import { isAuthenticated } from "../services/auth";
 
 import Login from "../pages/login";
-import Register from "../pages/register";
 import NotFound from "../pages/404";
 
 import Home from "../pages/home";
@@ -27,7 +26,6 @@ export default function Routes() {
     <Router history={history}>
       <Switch>
         <Route path="/" exact component={Login} />
-        <Route path="/register" exact component={Register} />
 
         <PrivateRoute path="/home" exact component={Home} />
         <Route component={NotFound} />
