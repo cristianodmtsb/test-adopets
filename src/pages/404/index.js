@@ -1,5 +1,13 @@
 import React from "react";
+import { Result, Button } from "antd";
 
-const NotFound = () => <h1>404 Not Found</h1>;
+const NotFound = () => (
+  <Result
+    status="403"
+    title="403"
+    subTitle="Sorry, you are not authorized to access this page."
+    extra={<Button type="primary">Back Home</Button>}
+  />
+);
 
 export default NotFound;

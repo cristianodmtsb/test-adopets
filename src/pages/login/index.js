@@ -1,9 +1,14 @@
 import React, { Component } from "react";
-import { Form, Icon, Input, Button } from "antd";
+import { Form, Icon, Input, Button, message, Card, Row, Col } from "antd";
 
-import api from "../../services/api";
+import apiKey from "../../services/apiKey";
+import { login } from "../../services/auth";
 import { veryfyAccessToken } from "../../services/accessToken";
+
 import history from "../../services/history";
+import "./style.css";
+
+import Logo from "../../assets/images/adopets-logo.svg";
 
 class LoginClass extends Component {
   state = {
@@ -23,19 +28,16 @@ class LoginClass extends Component {
   handleSubmit = e => {
     e.preventDefault();
     let { email, password } = this.state;
+    this.openMessage();
 
     this.props.form.validateFields(async err => {
       if (!err) {
-        const response = await api
+        await apiKey
           .post("/auth/session-register", {
             organization_user: { email, password }
           })
           .then(response => {
-            /**
-             * Here we need setup the TOKEN from api
-             * But because the access token key i just show de response data
-             */
-            console.log("Data access_key", response.data);
+            login(response.data.data.access_key);
             return history.push("/home");
           })
           .catch(error => {
@@ -45,45 +47,98 @@ class LoginClass extends Component {
     });
   };
 
+  openMessage = () => {
+    const key = "updatable";
+    message.loading({ content: "Sing in...", key });
+    setTimeout(() => {
+      message.success({ content: "OK!", key, duration: 2 });
+    }, 1000);
+  };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     return (
-      <Form onSubmit={this.handleSubmit} className="login-form">
-        <Form.Item>
-          {getFieldDecorator("email", {
-            rules: [{ required: true, message: "Please input your email!" }]
-          })(
-            <Input
-              prefix={<Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />}
-              placeholder="Email"
-              type="email"
-              onChange={e => this.setState({ email: e.target.value })}
-            />
-          )}
-        </Form.Item>
-        <Form.Item>
-          {getFieldDecorator("password", {
-            rules: [{ required: true, message: "Please input your Password!" }]
-          })(
-            <Input
-              prefix={<Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />}
-              type="password"
-              placeholder="Password"
-              onChange={e => this.setState({ password: e.target.value })}
-            />
-          )}
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            className="login-form-button"
+      <>
+        <Row
+          type="flex"
+          justify="center"
+          align="middle"
+          style={{
+            height: "100%"
+          }}
+        >
+          <Col
+            xs={16}
+            sm={14}
+            md={10}
+            lg={8}
+            xl={6}
+            style={{
+              textAlign: "center"
+            }}
           >
-            Log in
-          </Button>
-          Or <a href="/">register now!</a>
-        </Form.Item>
-      </Form>
+            <div className="logo-login">
+              <img src={Logo} alt="Adopets" />
+            </div>
+
+            <Card>
+              <Form onSubmit={this.handleSubmit} className="login-form">
+                <Form.Item>
+                  {getFieldDecorator("email", {
+                    rules: [
+                      { required: true, message: "Please input your email!" }
+                    ]
+                  })(
+                    <Input
+                      prefix={
+                        <Icon
+                          type="user"
+                          style={{ color: "rgba(0,0,0,.25)" }}
+                        />
+                      }
+                      placeholder="Email"
+                      type="email"
+                      onChange={e => this.setState({ email: e.target.value })}
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item>
+                  {getFieldDecorator("password", {
+                    rules: [
+                      { required: true, message: "Please input your Password!" }
+                    ]
+                  })(
+                    <Input.Password
+                      prefix={
+                        <Icon
+                          type="lock"
+                          style={{ color: "rgba(0,0,0,.25)" }}
+                        />
+                      }
+                      type="password"
+                      placeholder="Password"
+                      onChange={e =>
+                        this.setState({ password: e.target.value })
+                      }
+                    />
+                  )}
+                </Form.Item>
+                <Form.Item>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="login-form-button"
+                  >
+                    Log in
+                  </Button>
+                  <br />
+                  Or <a href="/">register now!</a>
+                </Form.Item>
+              </Form>
+            </Card>
+          </Col>
+        </Row>
+      </>
     );
   }
 }
