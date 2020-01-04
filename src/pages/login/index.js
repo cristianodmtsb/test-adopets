@@ -13,7 +13,8 @@ import Logo from "../../assets/images/adopets-logo.svg";
 class LoginClass extends Component {
   state = {
     email: "",
-    password: ""
+    password: "",
+    error: ""
   };
 
   componentDidMount() {
@@ -28,7 +29,6 @@ class LoginClass extends Component {
   handleSubmit = e => {
     e.preventDefault();
     let { email, password } = this.state;
-    this.openMessage();
 
     this.props.form.validateFields(async err => {
       if (!err) {
@@ -38,20 +38,26 @@ class LoginClass extends Component {
           })
           .then(response => {
             login(response.data.data.access_key);
+            this.setState({ error: "" });
             return history.push("/home");
           })
           .catch(error => {
+            this.setState({ error: "An error was encountered." });
             console.log("Error Login: ", error);
           });
       }
+      this.openMessage();
     });
   };
 
   openMessage = () => {
     const key = "updatable";
+    const { error } = this.state;
     message.loading({ content: "Sing in...", key });
     setTimeout(() => {
-      message.success({ content: "OK!", key, duration: 2 });
+      error
+        ? message.error({ content: error, key, duration: 2 })
+        : message.success({ content: "OK!", key, duration: 2 });
     }, 1000);
   };
 
