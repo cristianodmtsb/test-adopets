@@ -1,6 +1,7 @@
 import api from "./api";
+import { APP_KEY } from "../env";
 
-let config = { system_api_key: "505763d6-4202-4b05-9efc-93b366939bcf" };
+let config = { system_api_key: APP_KEY };
 
 export const veryfyAccessToken = () => {
   const requestAPIToken = api

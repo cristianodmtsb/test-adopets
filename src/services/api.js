@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_URL } from "../env";
 import { getToken } from "./auth";
 
 const api = axios.create({
-  baseURL: "https://test.adopets.app/v1"
+  baseURL: API_URL
 });
 
 api.interceptors.request.use(async config => {
